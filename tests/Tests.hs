@@ -19,6 +19,10 @@ tests = testCaseSteps "example" $ \step -> do
         step "Testing riverMap..."
         R.riverMap R.Normal R.Super "Comma" (R.rSpawn "beep") @?= ["map","normal","Super","Comma","spawn","beep"]
 
+
+        step "Testing riverMap with multi-parameter calls..."
+        R.riverMap R.Normal R.Super "Comma" (R.rSpawn "'what is hell supposed to be like? my code will tell you'") @?= ["map","normal","Super","Comma","spawn","what is hell supposed to be like? my code will tell you"]
+
         step "Testing riverMapPointer..."
         R.riverMapPointer R.Normal R.Super "BTN_LEFT" (R.rSpawn "beep") @?= ["map-pointer","normal","Super","BTN_LEFT","spawn","beep"]
    
