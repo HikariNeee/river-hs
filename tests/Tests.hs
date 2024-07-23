@@ -24,7 +24,7 @@ tests = testCaseSteps "example" $ \step -> do
         R.riverMap R.Normal R.Super "Comma" (R.rSpawn "'what is hell supposed to be like? my code will tell you'") @?= ["map","normal","Super","Comma","spawn","what is hell supposed to be like? my code will tell you"]
 
         step "Testing riverMapPointer..."
-        R.riverMapPointer R.Normal R.Super "BTN_LEFT" (R.rSpawn "beep") @?= ["map-pointer","normal","Super","BTN_LEFT","spawn","beep"]
+        R.riverMapPointer R.Normal R.Super "BTN_LEFT" (R.rSpawn "beep") @?= Right ["map-pointer","normal","Super","BTN_LEFT","spawn","beep"]
    
         step "Testing riverBackgroundColour..."
         R.riverBackgroundColour "0xffffffff" @?= ["background-color","0xffffffff"]

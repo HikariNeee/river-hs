@@ -2,6 +2,7 @@ module Main where
 
 import Data.Foldable (for_)
 import qualified River as R
+import Data.Either (rights)
 
 initialKeymap :: [[String]]
 initialKeymap =
@@ -18,7 +19,11 @@ initialKeymap =
   , (R.riverNormalMap R.SA "J" $ R.rMove R.Down "100")
   , (R.riverNormalMap R.SA "K" $ R.rMove R.Up "100")
   , (R.riverNormalMap R.Super "Print" $ R.rSpawn "'grim -g \"$(slurp)\" -| wl-copy && notify-send \"Screenshot Clipped\"'")
-  , (R.riverNormalMapPointer R.Super "BTN_LEFT" $ R.rMoveView)
+  ]
+
+initialPointerKeymap :: [[String]]
+initialPointerKeymap = rights
+  [ (R.riverNormalMapPointer R.Super "BTN_LEFT" $ R.rMoveView)
   , (R.riverNormalMapPointer R.Super "BTN_RIGHT" $ R.rResizeView)
   , (R.riverNormalMapPointer R.Super "BTN_MIDDLE" $ R.rToggleFloat)
   ]
@@ -26,6 +31,7 @@ initialKeymap =
 main :: IO ()
 main = do
   R.applyKeybinds initialKeymap
+  print initialPointerKeymap
   R.riverCreateTags 9
   R.riverAllTags "0"
   for_ [R.riverHideCursor "timeout" "5000",R.riverHideCursor "when-typing" "enabled"] R.callRiver

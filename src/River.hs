@@ -1,4 +1,4 @@
-{-# LANGUAGE BangPatterns #-}
+{-# LANGUAGE StrictData #-}
 {-# LANGUAGE ScopedTypeVariables #-}
 
 module River where
@@ -7,7 +7,7 @@ import Bits.Show
 import Control.Monad (join)
 import Data.Bits (shiftL)
 import Data.Bool (bool)
-import Data.Foldable (for_)
+import Data.Foldable (for_,traverse_)
 import Data.List.Split
 import System.Process
 
@@ -18,22 +18,22 @@ data Mode = Normal | Locked
 data Modifiers = Super | Alt | Control | SA | SAC | SC | SS | None | AS | SAS
 
 data RiverOpt
-  = MkOpt !String
-  | MkPar !String !String
-  | MkPos !String !Position
-  | MkAxis !String !Axis
-  | MkView !String !View
-  | MkTri !String !String !String
-  | MkMode !String !Mode
+  = MkOpt String
+  | MkPar String String
+  | MkPos String Position
+  | MkAxis String Axis
+  | MkView String View
+  | MkTri String String String
+  | MkMode String Mode
 
 instance Show RiverOpt where
   show (MkOpt a) = a
-  show (MkPar a b) = (a ++ " " ++ b)
-  show (MkPos a b) = (a ++ " " ++ (show b))
-  show (MkAxis a b) = (a ++ " " ++ (show b))
-  show (MkView a b) = (a ++ " " ++ (show b))
-  show (MkTri a b c) = (a ++ " " ++ b ++ " " ++ c)
-  show (MkMode a b) = (a ++ " " ++ (show b))
+  show (MkPar a b) = a ++ " " ++ b
+  show (MkPos a b) = a ++ " " ++ show b
+  show (MkAxis a b) = a ++ " " ++ show b
+  show (MkView a b) = a ++ " " ++ show b
+  show (MkTri a b c) = a ++ " " ++ b ++ " " ++ c
+  show (MkMode a b) = a ++ " " ++ show b
 
 -- Nullary opts
 rMap :: RiverOpt
@@ -68,52 +68,52 @@ rExit = MkOpt "exit"
 
 -- Unary opts
 rSnap :: Position -> RiverOpt
-rSnap a = MkPos "snap" a
+rSnap = MkPos "snap" 
 
 rSetFocusedTags :: String -> RiverOpt
-rSetFocusedTags a = MkPar "set-focused-tags" a
+rSetFocusedTags = MkPar "set-focused-tags" 
 
 rSetViewTags :: String -> RiverOpt
-rSetViewTags a = MkPar "set-view-tags" a
+rSetViewTags = MkPar "set-view-tags" 
 
 rToggleFocusedTags :: String -> RiverOpt
-rToggleFocusedTags a = MkPar "toggle-focused-tags" a
+rToggleFocusedTags = MkPar "toggle-focused-tags" 
 
 rToggleViewTags :: String -> RiverOpt
-rToggleViewTags a = MkPar "toggle-view-tags" a
+rToggleViewTags = MkPar "toggle-view-tags" 
 
 rSpawn :: String -> RiverOpt
-rSpawn a = MkPar "spawn" a
+rSpawn = MkPar "spawn" 
 
 rSendLayoutCommand :: String -> RiverOpt
-rSendLayoutCommand a = MkPar "send-layout-cmd" a
+rSendLayoutCommand = MkPar "send-layout-cmd" 
 
 rSendToOutput :: View -> RiverOpt
-rSendToOutput a = MkView "send-to-output" a
+rSendToOutput = MkView "send-to-output" 
 
 rFocusView :: View -> RiverOpt
-rFocusView a = MkView "focus-view" a
+rFocusView = MkView "focus-view" 
 
 rSwapView :: View -> RiverOpt
-rSwapView a = MkView "swap-view" a
+rSwapView = MkView "swap-view" 
 
 rFocusOutput :: View -> RiverOpt
-rFocusOutput a = MkView "focus-output" a
+rFocusOutput = MkView "focus-output" 
 
 rBackgroundColour :: String -> RiverOpt
-rBackgroundColour a = MkPar "background-color" a
+rBackgroundColour = MkPar "background-color" 
 
 rBorderColourUnfocused :: String -> RiverOpt
-rBorderColourUnfocused a = MkPar "border-color-unfocused" a
+rBorderColourUnfocused = MkPar "border-color-unfocused" 
 
 rBorderColourFocused :: String -> RiverOpt
-rBorderColourFocused a = MkPar "border-color-focused" a
+rBorderColourFocused = MkPar "border-color-focused" 
 
 rRuleAdd :: String -> RiverOpt
-rRuleAdd a = MkPar "rule-add" a
+rRuleAdd = MkPar "rule-add" 
 
 rDefaultLayout :: String -> RiverOpt
-rDefaultLayout a = MkPar "default-layout" a
+rDefaultLayout = MkPar "default-layout" 
 
 rDeclareMode :: String -> RiverOpt
 rDeclareMode a = MkPar "declare-mode" a
@@ -122,23 +122,23 @@ rFocusFollowsCursor :: Mode -> RiverOpt
 rFocusFollowsCursor a = MkMode "focus-follows-cursor" a
 
 rSetCursorWarp :: String -> RiverOpt
-rSetCursorWarp a = MkPar "set-cursor-warp" a
+rSetCursorWarp = MkPar "set-cursor-warp"
 
 rSwap :: View -> RiverOpt
-rSwap a = MkView "swap" a
+rSwap = MkView "swap" 
 
 -- binary opts
 rResize :: Axis -> String -> RiverOpt
-rResize a b = MkTri "resize" (show a) b
+rResize a = MkTri "resize" (show a)
 
 rMove :: Position -> String -> RiverOpt
-rMove a b = MkTri "move" (show a) b
+rMove a = MkTri "move" (show a) 
 
 rSetRepeat :: String -> String -> RiverOpt
-rSetRepeat a b = MkTri "set-repeat" a b
+rSetRepeat = MkTri "set-repeat"
 
 rHideCursor :: String -> String -> RiverOpt
-rHideCursor a b = MkTri "hide-cursor" a b
+rHideCursor = MkTri "hide-cursor"
 
 data RiverCmdKb = RiverCmdKb
   { function :: RiverOpt
@@ -180,7 +180,7 @@ instance Show Mode where
   show Locked = "locked"
 
 callRiver :: [String] -> IO ()
-callRiver a = callProcess "riverctl" a
+callRiver = callProcess "riverctl" 
 
 splitAtQuote :: String -> [String]
 splitAtQuote = (split . dropBlanks . dropDelims . whenElt) (== '\'')
@@ -190,9 +190,10 @@ riverToList a =
   if (join . splitAtQuote $ show $ command a) == (show $ command a)
     then
       concatMap words [show $ function a, show $ mode a, show $ modifier a, key a, show $ command a]
-    else map (unwords . words) (join [[show $ function a], [show $ mode a], [show $ modifier a], [key a], z])
+    else map trimSpaces $ [show $ function a, show $ mode a, show $ modifier a, key a] ++ z
  where
   z = splitAtQuote $ show $ command a
+  trimSpaces = unwords . words
 
 riverMap :: Mode -> Modifiers -> String -> RiverOpt -> [String]
 riverMap a b c d = riverToList $ RiverCmdKb{function = rMap, mode = a, modifier = b, key = c, command = d}
@@ -200,47 +201,47 @@ riverMap a b c d = riverToList $ RiverCmdKb{function = rMap, mode = a, modifier 
 riverNormalMap :: Modifiers -> String -> RiverOpt -> [String]
 riverNormalMap = riverMap Normal
 
-riverMapPointer :: Mode -> Modifiers -> String -> RiverOpt -> [String]
+riverMapPointer :: Mode -> Modifiers -> String -> RiverOpt -> Either String [String]
 riverMapPointer a b c d = bool x y (c `elem` ["BTN_LEFT", "BTN_RIGHT", "BTN_MIDDLE"])
  where
-  y = riverToList $ RiverCmdKb{function = rMapPointer, mode = a, modifier = b, key = c, command = d}
-  x = error "You are supposed to provide either BTN_LEFT,BTN_RIGHT or BTN_MIDDLE!"
+  y = Prelude.Right $ riverToList $ RiverCmdKb{function = rMapPointer, mode = a, modifier = b, key = c, command = d}
+  x = Prelude.Left "You are supposed to provide either BTN_LEFT,BTN_RIGHT or BTN_MIDDLE!"
 
-riverNormalMapPointer :: Modifiers -> String -> RiverOpt -> [String]
+riverNormalMapPointer :: Modifiers -> String -> RiverOpt -> Either String [String]
 riverNormalMapPointer = riverMapPointer Normal
 
 riverBackgroundColour :: String -> [String]
-riverBackgroundColour a = concatMap words [show $ rBackgroundColour a]
+riverBackgroundColour a = words (show $ rBackgroundColour a)
 
 riverBorderColourFocused :: String -> [String]
-riverBorderColourFocused a = concatMap words [show $ rBorderColourFocused a]
+riverBorderColourFocused a = words (show $ rBorderColourFocused a)
 
 riverBorderColourUnfocused :: String -> [String]
-riverBorderColourUnfocused a = concatMap words [show $ rBorderColourUnfocused a]
+riverBorderColourUnfocused a = words (show $ rBorderColourUnfocused a)
 
 riverRuleAdd :: String -> [String]
-riverRuleAdd a = concatMap words [show $ rRuleAdd a]
+riverRuleAdd a = words (show $ rRuleAdd a)
 
 riverFocusFollowsCursor :: [String]
-riverFocusFollowsCursor = concatMap words [show $ rFocusFollowsCursor Normal]
+riverFocusFollowsCursor = words (show $ rFocusFollowsCursor Normal)
 
 riverSetCursorWarp :: [String]
-riverSetCursorWarp = concatMap words [show $ rSetCursorWarp (show rOnFocusChange)]
+riverSetCursorWarp = words (show $ rSetCursorWarp (show rOnFocusChange))
 
 riverHideCursor :: String -> String -> [String]
-riverHideCursor a b = concatMap words [show $ rHideCursor a b]
+riverHideCursor a b = words (show $ rHideCursor a b)
 
 riverDefaultLayout :: String -> [String]
-riverDefaultLayout a = concatMap words [show $ rDefaultLayout a]
+riverDefaultLayout a = words (show $ rDefaultLayout a)
 
 riverSetRepeat :: String -> String -> [String]
-riverSetRepeat a b = concatMap words [show $ rSetRepeat a b]
+riverSetRepeat a b = words (show $ rSetRepeat a b)
 
 applyKeybinds :: [[String]] -> IO ()
-applyKeybinds a = let x = a in for_ x callRiver
+applyKeybinds = traverse_ callRiver
 
 callExternal :: String -> [String] -> IO ()
-callExternal a b = callProcess a b
+callExternal = callProcess
 
 computeTags :: Int -> Int
 computeTags y = 1 `shiftL` (y - 1)
