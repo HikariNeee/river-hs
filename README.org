@@ -1,0 +1,13 @@
+#+title: river-hs
+#+author: Hikari
+
+
+* river-hs
+river-hs is a wrapper over ~riverctl~ which allows you to create custom riverWM configurations in Haskell!
+
+** How to use
+ It is extremely easy to use river-hs, just git clone the project into your ~~/.config/river~ and modify ~app/Main.hs~
+ to your liking! Once you're done, ~cabal build~ the project and copy over the binary into the root directory.
+
+ 
+ 
