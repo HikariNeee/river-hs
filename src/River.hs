@@ -241,7 +241,7 @@ applyKeybinds :: [[String]] -> IO ()
 applyKeybinds = traverse_ callRiver
 
 callExternal :: String -> [String] -> IO ()
-callExternal = callProcess
+callExternal a b = spawnProcess a b >> return ()
 
 computeTags :: Int -> Int
 computeTags y = 1 `shiftL` (y - 1)

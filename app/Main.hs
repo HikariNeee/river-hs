@@ -42,4 +42,5 @@ main = do
   R.callRiver $ R.riverBorderColourUnfocused "0x000000"
   R.callRiver $ R.riverSetRepeat "50" "250"
   R.callRiver $ R.riverDefaultLayout "bsp-layout"
+  R.callExternal "swaybg" ["-i", "/path/to/some/image"] 
   R.callExternal "river-bsp-layout" ["--inner-gap","5", "--outer-gap", "10", "--split-perc", "0.5"]
