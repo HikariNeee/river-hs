@@ -28,7 +28,7 @@ main = do
   R.applyKeybinds initialKeymap
   R.riverCreateTags 9
   R.riverAllTags "0"
-  for_ [R.riverHideCursor "timeout" "5000", R.riverHideCursor "when-typing" "enabled"] R.callRiver
+  for_ [R.riverHideCursor "timeout" "5000",R.riverHideCursor "when-typing" "enabled"] R.callRiver
   R.callRiver $ R.riverSetCursorWarp
   R.callRiver $ R.riverFocusFollowsCursor
   R.callRiver $ R.riverBackgroundColour "0x002b36"
@@ -36,4 +36,4 @@ main = do
   R.callRiver $ R.riverBorderColourUnfocused "0x000000"
   R.callRiver $ R.riverSetRepeat "50" "250"
   R.callRiver $ R.riverDefaultLayout "bsp-layout"
-  R.callExternal "river-bsp-layout" ["--inner-gap 5", "--outer-gap 10", "--split-perc 0.5", "&"]
+  R.callExternal "river-bsp-layout" ["--inner-gap","5", "--outer-gap", "10", "--split-perc", "0.5"]

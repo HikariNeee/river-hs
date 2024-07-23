@@ -225,7 +225,7 @@ riverFocusFollowsCursor :: [String]
 riverFocusFollowsCursor = concatMap words [show $ rFocusFollowsCursor Normal]
 
 riverSetCursorWarp :: [String]
-riverSetCursorWarp = concatMap words [show $ rOnFocusChange]
+riverSetCursorWarp = concatMap words [show $ rSetCursorWarp (show rOnFocusChange)]
 
 riverHideCursor :: String -> String -> [String]
 riverHideCursor a b = concatMap words [show $ rHideCursor a b]
