@@ -251,7 +251,7 @@ riverCreateTags y = for_ [1 .. y] h
  where
   h x =
     let
-      tags = showFiniteBits $ computeTags x
+      tags = show $ computeTags x
      in
       applyKeybinds
         [ (riverMap Normal Super (show x) (rSetFocusedTags tags))
