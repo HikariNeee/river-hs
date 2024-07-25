@@ -180,7 +180,7 @@ instance Show Mode where
   show Locked = "locked"
 
 callRiver :: [String] -> IO ()
-callRiver = callProcess "riverctl" 
+callRiver a = spawnProcess "riverctl" a >> return ()
 
 splitAtQuote :: String -> [String]
 splitAtQuote = (split . dropBlanks . dropDelims . whenElt) (== '\'')
