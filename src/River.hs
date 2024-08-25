@@ -3,13 +3,13 @@
 
 module River where
 
-import Bits.Show
-import Control.Monad (join)
+import Control.Monad (join,void)
 import Data.Bits (shiftL)
 import Data.Bool (bool)
 import Data.Foldable (for_,traverse_)
 import Data.List.Split
-import System.Process
+import System.Process.Typed
+
 
 data View = Next | Previous
 data Position = Left | Right | Up | Down
@@ -180,7 +180,7 @@ instance Show Mode where
   show Locked = "locked"
 
 callRiver :: [String] -> IO ()
-callRiver a = spawnProcess "riverctl" a >> return ()
+callRiver a = void (startProcess $ proc "riverctl" a)
 
 splitAtQuote :: String -> [String]
 splitAtQuote = (split . dropBlanks . dropDelims . whenElt) (== '\'')
@@ -241,7 +241,7 @@ applyKeybinds :: [[String]] -> IO ()
 applyKeybinds = traverse_ callRiver
 
 callExternal :: String -> [String] -> IO ()
-callExternal a b = spawnProcess a b >> return ()
+callExternal a b = void (startProcess $ proc a b)
 
 computeTags :: Int -> Int
 computeTags y = 1 `shiftL` (y - 1)
@@ -254,10 +254,10 @@ riverCreateTags y = for_ [1 .. y] h
       tags = show $ computeTags x
      in
       applyKeybinds
-        [ (riverMap Normal Super (show x) (rSetFocusedTags tags))
-        , (riverMap Normal SS (show x) (rSetViewTags tags))
-        , (riverMap Normal SC (show x) (rToggleFocusedTags tags))
-        , (riverMap Normal SAC (show x) (rToggleViewTags tags))
+        [ riverMap Normal Super (show x) (rSetFocusedTags tags)
+        , riverMap Normal SS (show x) (rSetViewTags tags)
+        , riverMap Normal SC (show x) (rToggleFocusedTags tags)
+        , riverMap Normal SAC (show x) (rToggleViewTags tags)
         ]
 
 riverAllTags :: String -> IO ()
@@ -267,6 +267,6 @@ riverAllTags x =
     tag = show $ ((1 :: Int) `shiftL` 32) - (1 :: Int)
    in
     applyKeybinds
-      [ (riverMap Normal Super x (rSetFocusedTags $ tag))
-      , (riverMap Normal SS x (rSetViewTags $ tag))
+      [ riverMap Normal Super x (rSetFocusedTags $ tag)
+      , riverMap Normal SS x (rSetViewTags $ tag)
       ]
